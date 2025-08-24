@@ -1,4 +1,5 @@
-// Custom AppError class for operational errors
+import { StatusCodes } from "http-status-codes";
+
 export class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -32,7 +33,7 @@ function sendErrorProd(err, res) {
       message: err.message,
     });
   } else {
-    res.status(500).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "error",
       message: "Something went wrong!",
     });
@@ -40,7 +41,7 @@ function sendErrorProd(err, res) {
 }
 
 const errorHandler = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
+  err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.status = err.status || "error";
 
   logError(err);

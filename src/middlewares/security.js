@@ -1,18 +1,4 @@
 export const protectSensitiveRoutes = {
-  csrfProtection: (req, res, next) => {
-    const referer = req.headers.referer || req.headers.referrer;
-    if (
-      req.method !== "GET" &&
-      (!referer || !referer.includes(process.env.FRONTEND_URL || "localhost"))
-    ) {
-      return res.status(403).json({
-        status: "error",
-        message: "Invalid request origin",
-      });
-    }
-    next();
-  },
-
   validateContentType: (req, res, next) => {
     if (["POST", "PUT", "PATCH"].includes(req.method)) {
       const contentType = req.headers["content-type"];
@@ -27,12 +13,13 @@ export const protectSensitiveRoutes = {
     next();
   },
 
-  setSecurityHeaders: (req, res, next) => {
-    res.setHeader(
-      "Permissions-Policy",
-      "geolocation=(), microphone=(), camera=()",
-    );
-    res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  ensureHttps: (req, res, next) => {
+    if (
+      process.env.NODE_ENV === "production" &&
+      req.headers["x-forwarded-proto"] !== "https"
+    ) {
+      return res.redirect("https://" + req.headers.host + req.url);
+    }
     next();
   },
 };

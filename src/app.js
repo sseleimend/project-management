@@ -2,7 +2,6 @@ import { rateLimitConfig, corsConfig } from "./config/security.js";
 import secureCookies from "./middlewares/secureCookies.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
-import protectSensitiveRoutes from "./middlewares/security.js";
 import authRoutes from "./routes/auth.js";
 
 const app = express();

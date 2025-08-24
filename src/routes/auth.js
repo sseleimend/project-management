@@ -4,6 +4,7 @@ import { protectSensitiveRoutes } from "../middlewares/security.js";
 
 const router = express.Router();
 
+router.use(protectSensitiveRoutes.ensureHttps);
 router.use(protectSensitiveRoutes.validateContentType);
 
 export default router;

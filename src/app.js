@@ -1,3 +1,12 @@
+import express from "express";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import hpp from "hpp";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
+
 import { rateLimitConfig, corsConfig } from "./config/security.js";
 import secureCookies from "./middlewares/secureCookies.js";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -5,6 +14,8 @@ import { ApiError } from "./utils/ApiError.js";
 import authRoutes from "./routes/auth.js";
 
 const app = express();
+
+app.disable("x-powered-by");
 
 app.use(express.json({ limit: "16kb" }));
 

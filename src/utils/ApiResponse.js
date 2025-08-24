@@ -6,5 +6,3 @@ export class ApiResponse {
     if (error !== null) this.error = error;
   }
 }
-
-export default ApiResponse;

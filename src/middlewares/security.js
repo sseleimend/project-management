@@ -1,13 +1,18 @@
+import { StatusCodes } from "http-status-codes";
+
+import { ApiError } from "../utils/ApiError.js";
+
 export const protectSensitiveRoutes = {
   validateContentType: (req, res, next) => {
     if (["POST", "PUT", "PATCH"].includes(req.method)) {
       const contentType = req.headers["content-type"];
       if (!contentType || !contentType.includes("application/json")) {
-        return res.status(415).json({
-          status: "error",
-          message:
+        next(
+          new ApiError(
             "Unsupported Media Type: Content-Type must be application/json",
-        });
+            StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+          ),
+        );
       }
     }
     next();

@@ -16,23 +16,11 @@ export const rateLimitConfig = {
   },
 };
 
-export const cspConfig = {
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'"],
-    styleSrc: ["'self'", "https://fonts.googleapis.com"],
-    fontSrc: ["'self'", "https://fonts.gstatic.com"],
-    imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
-    connectSrc: ["'self'", process.env.API_URL || "http://localhost:5000"],
-  },
-};
-
 export const corsConfig = {
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Content-Length", "X-Powered-By"],
   maxAge: 86400,
   optionsSuccessStatus: 204,
 };
@@ -48,7 +36,6 @@ export const cookieConfig = {
 
 export default {
   rateLimitConfig,
-  cspConfig,
   corsConfig,
   cookieConfig,
 };

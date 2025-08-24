@@ -1,15 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-
-export class AppError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
-    this.isOperational = true;
-
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 function logError(err) {
   if (process.env.NODE_ENV !== "production") {
@@ -18,25 +9,30 @@ function logError(err) {
 }
 
 function sendErrorDev(err, res) {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack,
-  });
+  res.status(err.statusCode).json(
+    new ApiResponse({
+      status: err.status,
+      message: err.message,
+      error: { ...err, stack: err.stack },
+    }),
+  );
 }
 
 function sendErrorProd(err, res) {
   if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+    res.status(err.statusCode).json(
+      new ApiResponse({
+        status: err.status,
+        message: err.message,
+      }),
+    );
   } else {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: "error",
-      message: "Something went wrong!",
-    });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      new ApiResponse({
+        status: "error",
+        message: "Something went wrong!",
+      }),
+    );
   }
 }
 

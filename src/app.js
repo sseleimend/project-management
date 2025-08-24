@@ -44,7 +44,7 @@ app.use(cors(corsConfig));
 
 app.use("/api/auth", authRoutes);
 
-app.all("*", (req, res, next) => {
+app.all(/.*/, (req, res, next) => {
   next(new AppError(`Cannot find ${req.originalUrl} on this server!`, 404));
 });
 

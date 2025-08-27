@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import hpp from "hpp";
@@ -11,15 +12,24 @@ import { rateLimitConfig, corsConfig } from "./config/security.js";
 import secureCookies from "./middlewares/secureCookies.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
+import logger from "./utils/logger.js";
 import authRoutes from "./routes/auth.js";
 
 const app = express();
 
 app.disable("x-powered-by");
 
-app.use(express.json({ limit: "16kb" }));
+app.use(
+  morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  }),
+);
 
+app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
 app.use(secureCookies);
 app.use(helmet());
 app.use(hpp());

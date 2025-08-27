@@ -46,4 +46,7 @@ mongoose.connection.on("error", (err) => {
   logger.error("MongoDB connection error:", err);
 });
 
-export default mongoose;
+export default {
+  connectToMongoDB,
+  closeMongoDBConnection,
+};

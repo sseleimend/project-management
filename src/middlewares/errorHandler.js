@@ -1,12 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { ApiResponse } from "../utils/ApiResponse.js";
-
-function logError(err) {
-  if (process.env.NODE_ENV !== "production") {
-    console.error("ERROR 💥", err);
-  }
-}
+import logger from "../utils/logger.js";
 
 function sendErrorDev(err, res) {
   res.status(err.statusCode).json(
@@ -40,11 +35,16 @@ const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.status = err.status || "error";
 
-  logError(err);
+  logger.error("ERROR 💥 %s", err.stack || err.message);
 
   if (process.env.NODE_ENV === "development") {
+    logger.debug("Sending development error response: %O", err);
     sendErrorDev(err, res);
   } else {
+    logger.info(
+      "Sending production error response for status %s",
+      err.statusCode,
+    );
     sendErrorProd(err, res);
   }
 };

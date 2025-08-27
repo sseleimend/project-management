@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 
 import app from "./app.js";
-import { closeConnection, connectWithRetry } from "./db/index.js";
+import { connectWithRetry } from "./db/index.js";
 import logger from "./utils/logger.js";
+import shutdown from "./utils/shutdown.js";
 
 dotenv.config();
 
@@ -23,29 +24,13 @@ const server = app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
 });
 
-function shutdown(signal) {
-  logger.info(`Received ${signal}. Shutting down gracefully...`);
-  server.close(() => {
-    logger.info("HTTP server closed.");
-    closeConnection();
-  });
-
-  setTimeout(() => {
-    logger.error("Forcefully shutting down after 10s.");
-    process.exit(1);
-  }, 10000).unref();
-}
-
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("uncaughtException", (err) => {
-  logger.error("Uncaught Exception: %s", err.stack || err.message);
-  process.exit(1);
-});
-process.on("unhandledRejection", (reason) => {
-  logger.error(
-    "Unhandled Rejection: %s",
-    reason && reason.stack ? reason.stack : reason,
-  );
-  process.exit(1);
-});
+process.on("uncaughtException", (err) =>
+  shutdown("uncaughtException", err, "Uncaught Exception"),
+);
+process.on("unhandledRejection", (reason) =>
+  shutdown("unhandledRejection", reason, "Unhandled Rejection"),
+);
+
+export default server;

@@ -1,5 +1,6 @@
 import logger from "../utils/logger.js";
 import mongoose from "mongoose";
+import shutdown from "../utils/shutdown.js";
 
 const options = {
   maxPoolSize: 10,
@@ -22,8 +23,11 @@ export async function connectWithRetry() {
       );
       setTimeout(connectWithRetry, 5000);
     } else {
-      logger.error("MongoDB connection failed after all retries.", err);
-      process.exit(1);
+      shutdown(
+        "MongoDBConnectionException",
+        err,
+        "MongoDB connection failed after all retries",
+      );
     }
   }
 }

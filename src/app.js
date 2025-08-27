@@ -13,7 +13,8 @@ import { secureCookies } from "./middlewares/secureCookies.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
 import { logger } from "./utils/logger.js";
-import { authRoutes } from "./routes/auth.js";
+import { authRoutes } from "./routes/auth.routes.js";
+import { standardRoutes } from "./routes/standard.routes.js";
 
 export const app = express();
 
@@ -32,6 +33,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use(secureCookies);
 app.use(helmet());
+app.use(cors(corsConfig));
 app.use(hpp());
 app.use(mongoSanitize());
 app.use(xss());
@@ -39,12 +41,8 @@ app.use(xss());
 const standardLimiter = rateLimit(rateLimitConfig.standard);
 const authLimiter = rateLimit(rateLimitConfig.auth);
 
-app.use("/api", standardLimiter);
-app.use("/api/auth", authLimiter);
-
-app.use(cors(corsConfig));
-
-app.use("/api/auth", authRoutes);
+app.use("/api/v1", standardLimiter, standardRoutes);
+app.use("/api/v1/auth", authLimiter, authRoutes);
 
 app.all(/.*/, (req, res, next) => {
   next(new ApiError(`Cannot find ${req.originalUrl} on this server!`, 404));

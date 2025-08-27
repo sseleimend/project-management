@@ -10,7 +10,6 @@ dotenv.config();
 const requiredEnv = ["PORT", "FRONTEND_URL", "COOKIE_SECRET", "MONGODB_URI"];
 const missing = requiredEnv.filter((key) => !process.env[key]);
 if (missing.length > 0) {
-  logger.error(`Missing required environment variables: ${missing.join(", ")}`);
   throw new Error(
     `Missing required environment variables: ${missing.join(", ")}`,
   );

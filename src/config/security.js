@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 export const rateLimitConfig = {
   standard: {
     windowMs: 60 * 60 * 1000,
@@ -22,7 +24,7 @@ export const corsConfig = {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   maxAge: 86400,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: StatusCodes.NO_CONTENT,
 };
 
 export const cookieConfig = {

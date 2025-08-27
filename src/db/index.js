@@ -28,6 +28,13 @@ export async function connectWithRetry() {
   }
 }
 
+export function closeConnection() {
+  mongoose.connection.close(() => {
+    logger.info("MongoDB connection closed.");
+    process.exit(0);
+  });
+}
+
 mongoose.connection.on("disconnected", () => {
   logger.warn("MongoDB disconnected. Attempting to reconnect...");
   connectWithRetry();

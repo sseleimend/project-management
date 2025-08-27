@@ -37,15 +37,15 @@ export function errorHandler(err, req, res, next) {
 
   logger.error("ERROR 💥 %s", err.stack || err.message);
 
-  if (process.env.NODE_ENV === "development") {
-    logger.debug("Sending development error response: %O", err);
-    sendErrorDev(err, res);
-  } else {
+  if (process.env.NODE_ENV === "production") {
     logger.info(
       "Sending production error response for status %s",
       err.statusCode,
     );
     sendErrorProd(err, res);
+  } else {
+    logger.debug("Sending development error response: %O", err);
+    sendErrorDev(err, res);
   }
 }
 

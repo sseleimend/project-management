@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { ApiResponse } from "../utils/ApiResponse.js";
-import logger from "../utils/logger.js";
+import { logger } from "../utils/logger.js";
 
 function sendErrorDev(err, res) {
   res.status(err.statusCode).json(
@@ -31,7 +31,7 @@ function sendErrorProd(err, res) {
   }
 }
 
-const errorHandler = (err, req, res, next) => {
+export function errorHandler(err, req, res, next) {
   err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.status = err.status || "error";
 
@@ -47,6 +47,6 @@ const errorHandler = (err, req, res, next) => {
     );
     sendErrorProd(err, res);
   }
-};
+}
 
 export default errorHandler;

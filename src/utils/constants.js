@@ -3,7 +3,6 @@ export const UserRoles = {
   PROJECT_ADMIN: "project_admin",
   MEMBER: "member",
 };
-
 export const AvailableUserRoles = Object.values(UserRoles);
 
 export const TaskStatus = {
@@ -11,5 +10,11 @@ export const TaskStatus = {
   IN_PROGRESS: "in_progress",
   DONE: "done",
 };
-
 export const AvailableTaskStatus = Object.values(TaskStatus);
+
+export default {
+  UserRoles,
+  AvailableUserRoles,
+  TaskStatus,
+  AvailableTaskStatus,
+};

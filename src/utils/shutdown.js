@@ -1,6 +1,8 @@
-import logger from "./logger.js";
+import { logger } from "./logger.js";
+import { closeMongoDBConnection } from "../db/index.js";
+import { server } from "../index.js";
 
-function shutdown(signal, error, logMessage) {
+export function shutdown(signal, error, logMessage) {
   logger.info(
     `Received ${signal}. Shutting down ${error ? "immediately" : "gracefully"}...`,
   );
@@ -15,7 +17,8 @@ function shutdown(signal, error, logMessage) {
 
   server.close(() => {
     logger.info("HTTP server closed.");
-    closeConnection();
+    closeMongoDBConnection();
+    process.exit(0);
   });
 
   setTimeout(() => {

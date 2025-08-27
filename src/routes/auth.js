@@ -7,4 +7,6 @@ const router = express.Router();
 router.use(protectSensitiveRoutes.ensureHttps);
 router.use(protectSensitiveRoutes.validateContentType);
 
-export default router;
+export const authRoutes = router;
+
+export default authRoutes;

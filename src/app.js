@@ -9,13 +9,13 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 
 import { rateLimitConfig, corsConfig } from "./config/security.js";
-import secureCookies from "./middlewares/secureCookies.js";
-import errorHandler from "./middlewares/errorHandler.js";
+import { secureCookies } from "./middlewares/secureCookies.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
-import logger from "./utils/logger.js";
-import authRoutes from "./routes/auth.js";
+import { logger } from "./utils/logger.js";
+import { authRoutes } from "./routes/auth.js";
 
-const app = express();
+export const app = express();
 
 app.disable("x-powered-by");
 

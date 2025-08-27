@@ -1,6 +1,7 @@
-import logger from "../utils/logger.js";
 import mongoose from "mongoose";
-import shutdown from "../utils/shutdown.js";
+
+import { logger } from "../utils/logger.js";
+import { shutdown } from "../utils/shutdown.js";
 
 const options = {
   maxPoolSize: 10,
@@ -10,7 +11,7 @@ const options = {
 
 let retries = 5;
 
-export async function connectWithRetry() {
+export async function connectToMongoDB() {
   try {
     await mongoose.connect(process.env.MONGODB_URI, options);
     logger.info("MongoDB connected");
@@ -21,7 +22,7 @@ export async function connectWithRetry() {
         `MongoDB connection failed. Retries left: ${retries}. Retrying in 5s...`,
         err,
       );
-      setTimeout(connectWithRetry, 5000);
+      setTimeout(connectToMongoDB, 5000);
     } else {
       shutdown(
         "MongoDBConnectionException",
@@ -32,16 +33,14 @@ export async function connectWithRetry() {
   }
 }
 
-export function closeConnection() {
+export function closeMongoDBConnection() {
   mongoose.connection.close(() => {
     logger.info("MongoDB connection closed.");
-    process.exit(0);
   });
 }
 
 mongoose.connection.on("disconnected", () => {
   logger.warn("MongoDB disconnected. Attempting to reconnect...");
-  connectWithRetry();
 });
 
 mongoose.connection.on("error", (err) => {

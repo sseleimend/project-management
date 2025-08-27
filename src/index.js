@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 
-import app from "./app.js";
-import { connectWithRetry } from "./db/index.js";
-import logger from "./utils/logger.js";
-import shutdown from "./utils/shutdown.js";
+import { app } from "./app.js";
+import { connectToMongoDB } from "./db/index.js";
+import { logger } from "./utils/logger.js";
+import { shutdown } from "./utils/shutdown.js";
 
 dotenv.config();
 
@@ -15,11 +15,11 @@ if (missing.length > 0) {
   );
 }
 
-connectWithRetry();
+connectToMongoDB();
 
 const PORT = process.env.PORT;
 
-const server = app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
 });
 

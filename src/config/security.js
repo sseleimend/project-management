@@ -1,5 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
+import { env } from "./env.js";
+
 export const rateLimitConfig = {
   standard: {
     windowMs: 60 * 60 * 1000,
@@ -19,7 +21,7 @@ export const rateLimitConfig = {
 };
 
 export const corsConfig = {
-  origin: process.env.FRONTEND_URL,
+  origin: env.FRONTEND_URL,
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -29,7 +31,7 @@ export const corsConfig = {
 
 export const cookieConfig = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: env.NODE_ENV === "production",
   sameSite: "strict",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",

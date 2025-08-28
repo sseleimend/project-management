@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import { logger } from "../utils/logger.js";
+import { env } from "../config/env.js";
 
 const options = {
   maxPoolSize: 10,
@@ -12,7 +13,7 @@ let retries = 5;
 
 export async function connectToMongoDB(shutdown) {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, options);
+    await mongoose.connect(env.MONGODB_URI, options);
     logger.info("MongoDB connected");
   } catch (err) {
     if (retries > 0) {

@@ -1,7 +1,9 @@
 import { createLogger, format, transports } from "winston";
 
+import { env } from "../config/env.js";
+
 export const logger = createLogger({
-  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  level: env.NODE_ENV === "production" ? "info" : "debug",
   format: format.combine(
     format.timestamp(),
     format.errors({ stack: true }),

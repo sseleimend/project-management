@@ -16,13 +16,14 @@ import { ApiError } from "./utils/ApiError.js";
 import { logger } from "./utils/logger.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { standardRoutes } from "./routes/standard.routes.js";
+import { env } from "./config/env.js";
 
 export const app = express();
 
 app.disable("x-powered-by");
 
 app.use(
-  morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
+  morgan(env.NODE_ENV === "production" ? "combined" : "dev", {
     stream: {
       write: (message) => logger.info(message.trim()),
     },
@@ -30,7 +31,7 @@ app.use(
 );
 
 app.use(express.json({ limit: "16kb" }));
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser(env.COOKIE_SECRET));
 
 app.use(helmet());
 app.use(xss());

@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { logger } from "../utils/logger.js";
+import { env } from "../config/env.js";
 
 function sendErrorDev(err, res) {
   res.status(err.statusCode).json(
@@ -37,7 +38,7 @@ export function errorHandler(err, req, res, next) {
 
   logger.error("ERROR 💥 %s", err.stack || err.message);
 
-  if (process.env.NODE_ENV === "production") {
+  if (env.NODE_ENV === "production") {
     logger.info(
       "Sending production error response for status %s",
       err.statusCode,

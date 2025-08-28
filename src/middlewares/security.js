@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { ApiError } from "../utils/ApiError.js";
+import { env } from "../config/env.js";
 
 export const protectSensitiveRoutes = {
   validateContentType: (req, res, next) => {
@@ -20,7 +21,7 @@ export const protectSensitiveRoutes = {
 
   ensureHttps: (req, res, next) => {
     if (
-      process.env.NODE_ENV === "production" &&
+      env.NODE_ENV === "production" &&
       req.headers["x-forwarded-proto"] !== "https"
     ) {
       return res.redirect("https://" + req.headers.host + req.url);

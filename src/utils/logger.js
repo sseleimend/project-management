@@ -2,67 +2,72 @@ import { createLogger, format, transports } from "winston";
 
 import { env } from "../config/env.js";
 
-class Logger {
-  static create() {
-    this.logger = createLogger({
-      level: env.NODE_ENV === "production" ? "info" : "debug",
-      format: format.combine(
-        format.timestamp(),
-        format.errors({ stack: true }),
-        format.splat(),
-        format.json(),
-      ),
-      transports: [
-        new transports.Console({
-          format: format.combine(format.colorize(), format.simple()),
-        }),
-        new transports.File({ filename: "logs/error.log", level: "error" }),
-        new transports.File({ filename: "logs/combined.log" }),
-      ],
-      exceptionHandlers: [
-        new transports.File({ filename: "logs/exceptions.log" }),
-      ],
-      rejectionHandlers: [
-        new transports.File({ filename: "logs/rejections.log" }),
-      ],
-    });
+const Logger = (function () {
+  class Logger {
+    static create() {
+      this._logger = createLogger({
+        level: env.NODE_ENV === "production" ? "info" : "debug",
+        format: format.combine(
+          format.timestamp(),
+          format.errors({ stack: true }),
+          format.splat(),
+          format.json(),
+        ),
+        transports: [
+          new transports.Console({
+            format: format.combine(format.colorize(), format.simple()),
+          }),
+          new transports.File({ filename: "logs/error.log", level: "error" }),
+          new transports.File({ filename: "logs/combined.log" }),
+        ],
+        exceptionHandlers: [
+          new transports.File({ filename: "logs/exceptions.log" }),
+        ],
+        rejectionHandlers: [
+          new transports.File({ filename: "logs/rejections.log" }),
+        ],
+      });
+    }
   }
-}
-Logger.create();
+
+  Logger.create();
+
+  return Logger;
+})();
 
 export class WorkerLogger extends Logger {
   static info(message, ...meta) {
-    this.logger.info(`[WORKER] ${message}`, ...meta);
+    this._logger.info(`[WORKER] ${message}`, ...meta);
   }
 
   static warn(message, ...meta) {
-    this.logger.warn(`[WORKER] ${message}`, ...meta);
+    this._logger.warn(`[WORKER] ${message}`, ...meta);
   }
 
   static error(message, ...meta) {
-    this.logger.error(`[WORKER] ${message}`, ...meta);
+    this._logger.error(`[WORKER] ${message}`, ...meta);
   }
 
   static debug(message, ...meta) {
-    this.logger.debug(`[WORKER] ${message}`, ...meta);
+    this._logger.debug(`[WORKER] ${message}`, ...meta);
   }
 }
 
 export class MasterLogger extends Logger {
   static info(message, ...meta) {
-    this.logger.info(`[MASTER] ${message}`, ...meta);
+    this._logger.info(`[MASTER] ${message}`, ...meta);
   }
 
   static warn(message, ...meta) {
-    this.logger.warn(`[MASTER] ${message}`, ...meta);
+    this._logger.warn(`[MASTER] ${message}`, ...meta);
   }
 
   static error(message, ...meta) {
-    this.logger.error(`[MASTER] ${message}`, ...meta);
+    this._logger.error(`[MASTER] ${message}`, ...meta);
   }
 
   static debug(message, ...meta) {
-    this.logger.debug(`[MASTER] ${message}`, ...meta);
+    this._logger.debug(`[MASTER] ${message}`, ...meta);
   }
 }
 

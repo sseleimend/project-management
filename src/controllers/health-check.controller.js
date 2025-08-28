@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 import { StatusCodes } from "http-status-codes";
 
-import { ApiResponse } from "../utils/ApiResponse.js";
-
-export async function healthCheck(req, res) {
+export async function healthCheck() {
   let dbStatus = "unknown";
   let dbOk = false;
   switch (mongoose.connection.readyState) {
@@ -25,8 +23,9 @@ export async function healthCheck(req, res) {
   }
 
   const uptime = process.uptime();
-  const response = new ApiResponse({
-    status: StatusCodes.OK,
+
+  return {
+    statusCode: StatusCodes.OK,
     message: "Health check successful",
     data: {
       uptime,
@@ -36,6 +35,5 @@ export async function healthCheck(req, res) {
         status: dbStatus,
       },
     },
-  });
-  res.status(StatusCodes.OK).json(response);
+  };
 }

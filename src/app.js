@@ -25,7 +25,7 @@ app.disable("x-powered-by");
 app.use(
   morgan(env.NODE_ENV === "production" ? "combined" : "dev", {
     stream: {
-      write: (message) => logger.info(message.trim()),
+      write: (message) => logger.info(`[WORKER] ${message.trim()}`),
     },
   }),
 );

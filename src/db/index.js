@@ -14,12 +14,12 @@ let retries = 5;
 export async function connectToMongoDB(shutdown) {
   try {
     await mongoose.connect(env.MONGODB_URI, options);
-    logger.info("MongoDB connected");
+    logger.info("[WORKER] MongoDB connected");
   } catch (err) {
     if (retries > 0) {
       retries--;
       logger.error(
-        `MongoDB connection failed. Retries left: ${retries}. Retrying in 5s...`,
+        `[WORKER] MongoDB connection failed. Retries left: ${retries}. Retrying in 5s...`,
         err,
       );
       setTimeout(connectToMongoDB, 5000);
@@ -35,16 +35,16 @@ export async function connectToMongoDB(shutdown) {
 
 export function closeMongoDBConnection() {
   mongoose.connection.close(() => {
-    logger.info("MongoDB connection closed.");
+    logger.info("[WORKER] MongoDB connection closed.");
   });
 }
 
 mongoose.connection.on("disconnected", () => {
-  logger.warn("MongoDB disconnected. Attempting to reconnect...");
+  logger.warn("[WORKER] MongoDB disconnected. Attempting to reconnect...");
 });
 
 mongoose.connection.on("error", (err) => {
-  logger.error("MongoDB connection error:", err);
+  logger.error("[WORKER] MongoDB connection error:", err);
 });
 
 export default {

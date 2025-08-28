@@ -36,16 +36,16 @@ export function errorHandler(err, req, res, next) {
   err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.status = err.status || "error";
 
-  logger.error("ERROR 💥 %s", err.stack || err.message);
+  logger.error("[WORKER] ERROR 💥 %s", err.stack || err.message);
 
   if (env.NODE_ENV === "production") {
     logger.info(
-      "Sending production error response for status %s",
+      "[WORKER] Sending production error response for status %s",
       err.statusCode,
     );
     sendErrorProd(err, res);
   } else {
-    logger.debug("Sending development error response: %O", err);
+    logger.debug("[WORKER] Sending development error response: %O", err);
     sendErrorDev(err, res);
   }
 }

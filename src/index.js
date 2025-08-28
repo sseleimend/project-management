@@ -68,10 +68,10 @@ if (isProd && cluster.isPrimary) {
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 } else {
   const PORT = env.PORT;
-  logger.info(`PID ${process.pid} starting.`);
+  logger.info(`[WORKER] PID ${process.pid} starting.`);
   let shutdown;
   const server = app.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
+    logger.info(`[WORKER] Server running on port ${PORT}`);
     shutdown = configShutdown(false, { server });
     connectToMongoDB(shutdown);
   });

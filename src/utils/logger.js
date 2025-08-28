@@ -4,6 +4,8 @@ import { env } from "../config/env.js";
 
 const Logger = (function () {
   class Logger {
+    static #date = new Date().toISOString().slice(0, 10);
+
     static create() {
       this._logger = createLogger({
         level: env.NODE_ENV === "production" ? "info" : "debug",
@@ -17,14 +19,21 @@ const Logger = (function () {
           new transports.Console({
             format: format.combine(format.colorize(), format.simple()),
           }),
-          new transports.File({ filename: "logs/error.log", level: "error" }),
-          new transports.File({ filename: "logs/combined.log" }),
+          new transports.File({
+            filename: `logs/${this.#date}-error.log`,
+            level: "error",
+          }),
+          new transports.File({ filename: `logs/${this.#date}-combined.log` }),
         ],
         exceptionHandlers: [
-          new transports.File({ filename: "logs/exceptions.log" }),
+          new transports.File({
+            filename: `logs/${this.#date}-exceptions.log`,
+          }),
         ],
         rejectionHandlers: [
-          new transports.File({ filename: "logs/rejections.log" }),
+          new transports.File({
+            filename: `logs/${this.#date}-rejections.log`,
+          }),
         ],
       });
     }

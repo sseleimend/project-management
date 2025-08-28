@@ -17,6 +17,7 @@ import { WorkerLogger } from "./utils/logger.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { standardRoutes } from "./routes/standard.routes.js";
 import { env } from "./config/env.js";
+import { StatusCodes } from "http-status-codes";
 
 export const app = express();
 
@@ -50,7 +51,12 @@ app.use("/api/v1", standardLimiter, standardRoutes);
 app.use("/api/v1/auth", authLimiter, authRoutes);
 
 app.all(/.*/, (req, res, next) => {
-  next(new ApiError(`Cannot find ${req.originalUrl} on this server!`, 404));
+  next(
+    new ApiError(
+      `Cannot find ${req.originalUrl} on this server!`,
+      StatusCodes.NOT_FOUND,
+    ),
+  );
 });
 
 app.use(errorHandler);

@@ -5,7 +5,7 @@ import { requestHandler } from "../utils/requestHandler.js";
 
 const router = express.Router();
 
-router.get("/", requestHandler(healthCheck));
+router.all("/", requestHandler(healthCheck));
 
 export const healthCheckRoutes = router;
 

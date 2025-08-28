@@ -20,19 +20,19 @@ const Logger = (function () {
             format: format.combine(format.colorize(), format.simple()),
           }),
           new transports.File({
-            filename: `logs/${this.#date}-error.log`,
+            filename: `logs/${this.#date}/error.log`,
             level: "error",
           }),
-          new transports.File({ filename: `logs/${this.#date}-combined.log` }),
+          new transports.File({ filename: `logs/${this.#date}/combined.log` }),
         ],
         exceptionHandlers: [
           new transports.File({
-            filename: `logs/${this.#date}-exceptions.log`,
+            filename: `logs/${this.#date}/exceptions.log`,
           }),
         ],
         rejectionHandlers: [
           new transports.File({
-            filename: `logs/${this.#date}-rejections.log`,
+            filename: `logs/${this.#date}/rejections.log`,
           }),
         ],
       });

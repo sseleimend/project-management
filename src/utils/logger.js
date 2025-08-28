@@ -2,7 +2,7 @@ import { createLogger, format, transports } from "winston";
 
 import { env } from "../config/env.js";
 
-(class Logger {
+class Logger {
   static create() {
     this.logger = createLogger({
       level: env.NODE_ENV === "production" ? "info" : "debug",
@@ -27,7 +27,8 @@ import { env } from "../config/env.js";
       ],
     });
   }
-}).create();
+}
+Logger.create();
 
 export class WorkerLogger extends Logger {
   static info(message, ...meta) {

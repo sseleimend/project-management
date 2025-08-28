@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import dotenv from "dotenv";
 import cluster from "cluster";
 import os from "os";
@@ -7,7 +9,22 @@ import { connectToMongoDB } from "./db/index.js";
 import { logger } from "./utils/logger.js";
 import { configShutdown } from "./utils/shutdown.js";
 
-dotenv.config();
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+const isLocalDev = process.env.LOCAL_DEV === "true";
+const dotenvFiles = [];
+if (isLocalDev) {
+  dotenvFiles.push(`.env.local`);
+  dotenvFiles.push(`.env.${NODE_ENV}.local`);
+} else {
+  dotenvFiles.push(`.env`);
+}
+dotenvFiles.forEach((file) => {
+  const filePath = path.resolve(process.cwd(), file);
+  if (fs.existsSync(filePath)) {
+    dotenv.config({ path: filePath, override: true });
+  }
+});
 
 const requiredEnv = ["PORT", "FRONTEND_URL", "COOKIE_SECRET", "MONGODB_URI"];
 const missing = requiredEnv.filter((key) => !process.env[key]);
@@ -17,9 +34,7 @@ if (missing.length > 0) {
   );
 }
 
-const PORT = process.env.PORT;
-const isProd = process.env.NODE_ENV === "production";
-
+const isProd = NODE_ENV === "production";
 if (isProd && cluster.isPrimary) {
   const shutdown = configShutdown(true, { cluster });
 
@@ -79,6 +94,8 @@ if (isProd && cluster.isPrimary) {
   process.on("SIGINT", () => shutdown("SIGINT"));
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 } else {
+  const PORT = process.env.PORT;
+
   logger.info(`PID ${process.pid} starting.`);
   let shutdown;
   const server = app.listen(PORT, () => {

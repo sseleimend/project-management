@@ -13,7 +13,7 @@ import { secureCookies } from "./middlewares/secureCookies.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { responseFormatter } from "./middlewares/responseFormatter.js";
 import { ApiError } from "./utils/ApiError.js";
-import { logger } from "./utils/logger.js";
+import { WorkerLogger } from "./utils/logger.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { standardRoutes } from "./routes/standard.routes.js";
 import { env } from "./config/env.js";
@@ -25,7 +25,7 @@ app.disable("x-powered-by");
 app.use(
   morgan(env.NODE_ENV === "production" ? "combined" : "dev", {
     stream: {
-      write: (message) => logger.info(`[WORKER] ${message.trim()}`),
+      write: (message) => WorkerLogger.info(message.trim()),
     },
   }),
 );

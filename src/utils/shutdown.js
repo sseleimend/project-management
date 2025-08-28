@@ -1,4 +1,4 @@
-import { logger } from "./logger.js";
+import { MasterLogger, WorkerLogger } from "./logger.js";
 import { closeMongoDBConnection } from "../db/index.js";
 
 export function configShutdown(isMaster, { cluster, server }) {
@@ -8,23 +8,23 @@ export function configShutdown(isMaster, { cluster, server }) {
 }
 
 function masterShutdown(cluster, signal) {
-  logger.warn(
-    `[MASTER] Received ${signal}. Shutting down all workers and master...`,
+  MasterLogger.warn(
+    `Received ${signal}. Shutting down all workers and master...`,
   );
   const workers = Object.values(cluster.workers);
   let exited = 0;
   if (workers.length === 0) {
-    logger.info(`[MASTER] No workers to shutdown. Exiting master.`);
+    MasterLogger.info(`No workers to shutdown. Exiting master.`);
     process.exit(0);
   }
   workers.forEach((w) => {
     w.on("exit", () => {
       exited++;
-      logger.info(
-        `[MASTER] Worker ${w.process.pid} exited during shutdown (${exited}/${workers.length})`,
+      MasterLogger.info(
+        `Worker ${w.process.pid} exited during shutdown (${exited}/${workers.length})`,
       );
       if (exited === workers.length) {
-        logger.info(`[MASTER] All workers exited. Exiting master.`);
+        MasterLogger.info(`All workers exited. Exiting master.`);
         process.exit(0);
       }
     });
@@ -32,32 +32,32 @@ function masterShutdown(cluster, signal) {
   });
 
   setTimeout(() => {
-    logger.error(`[MASTER] Force shutdown after 10s.`);
+    MasterLogger.error(`Force shutdown after 10s.`);
     process.exit(1);
   }, 10000).unref();
 }
 
 function workerShutdown(server, signal, error, logMessage) {
-  logger.info(
-    `[WORKER] Received ${signal}. Shutting down ${error ? "immediately" : "gracefully"}...`,
+  WorkerLogger.info(
+    `Received ${signal}. Shutting down ${error ? "immediately" : "gracefully"}...`,
   );
 
   if (error) {
-    logger.error(
-      `[WORKER] ${logMessage}: %s`,
+    WorkerLogger.error(
+      `${logMessage}: %s`,
       error && (error.stack || error.message || error),
     );
     process.exit(1);
   }
 
   server.close(() => {
-    logger.info("[WORKER] HTTP server closed.");
+    WorkerLogger.info("HTTP server closed.");
     closeMongoDBConnection();
     process.exit(0);
   });
 
   setTimeout(() => {
-    logger.error("[WORKER] Forcefully shutting down after 10s.");
+    WorkerLogger.error("Forcefully shutting down after 10s.");
     process.exit(1);
   }, 10000).unref();
 }

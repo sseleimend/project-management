@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { logger } from "../utils/logger.js";
+import { WorkerLogger } from "../utils/logger.js";
 import { env } from "../config/env.js";
 
 function sendErrorDev(err, res) {
@@ -36,16 +36,16 @@ export function errorHandler(err, req, res, next) {
   err.statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   err.status = err.status || "error";
 
-  logger.error("[WORKER] ERROR 💥 %s", err.stack || err.message);
+  WorkerLogger.error("ERROR 💥 %s", err.stack || err.message);
 
   if (env.NODE_ENV === "production") {
-    logger.info(
-      "[WORKER] Sending production error response for status %s",
+    WorkerLogger.info(
+      "Sending production error response for status %s",
       err.statusCode,
     );
     sendErrorProd(err, res);
   } else {
-    logger.debug("[WORKER] Sending development error response: %O", err);
+    WorkerLogger.debug("Sending development error response: %O", err);
     sendErrorDev(err, res);
   }
 }

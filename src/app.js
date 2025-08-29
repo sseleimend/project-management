@@ -18,6 +18,7 @@ import { authRoutes } from "./routes/auth.routes.js";
 import { standardRoutes } from "./routes/standard.routes.js";
 import { env } from "./config/env.js";
 import { StatusCodes } from "http-status-codes";
+import compression from "compression";
 
 export const app = express();
 
@@ -32,6 +33,7 @@ app.use(
 );
 
 app.use(express.json({ limit: "16kb" }));
+app.use(compression());
 app.use(cookieParser(env.COOKIE_SECRET));
 
 app.use(helmet());

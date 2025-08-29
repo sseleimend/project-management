@@ -7,6 +7,8 @@ import { MasterLogger, WorkerLogger } from "./utils/logger.js";
 import { configShutdown } from "./utils/shutdown.js";
 import { env } from "./config/env.js";
 
+import "./jobs/deleteOldLogs.js";
+
 const isProd = env.NODE_ENV === "production";
 if (isProd && cluster.isPrimary) {
   const shutdown = configShutdown(true, { cluster });

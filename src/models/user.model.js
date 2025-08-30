@@ -150,7 +150,7 @@ userSchema.statics.signUp = async function (email, username, password) {
     emailVerificationTemplate(savedUser.username, token),
   );
 
-  return savedUser;
+  return await User.findById(savedUser._id);
 };
 
 export const User = mongoose.model("User", userSchema);

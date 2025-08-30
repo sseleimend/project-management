@@ -1,9 +1,10 @@
 import crypto from "crypto";
-import { promisify } from "util";
 
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+import { env } from "../config/env.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -92,13 +93,13 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
+  return jwt.sign({ _id: this._id }, env.ACCESS_TOKEN_SECRET, {
+    expiresIn: env.ACCESS_TOKEN_EXPIRATION_TIME,
   });
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  const secret = process.env.REFRESH_TOKEN_SECRET;
+  const secret = env.REFRESH_TOKEN_SECRET;
   const token = crypto.randomBytes(40).toString("hex");
   const hash = crypto.createHmac("sha256", secret).update(token).digest("hex");
   this.refreshToken = hash;

@@ -5,6 +5,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { env } from "../config/env.js";
+import { ApiError } from "../utils/ApiError.js";
+import { sendEmail } from "../utils/email.js";
+import { emailVerificationTemplate } from "../templates/email.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,7 +19,6 @@ const userSchema = new mongoose.Schema(
         },
         localPath: {
           type: String,
-          required: [true, "Avatar local path is required"],
         },
       },
       default: {
@@ -99,9 +101,11 @@ userSchema.methods.generateAccessToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  const secret = env.REFRESH_TOKEN_SECRET;
   const token = crypto.randomBytes(40).toString("hex");
-  const hash = crypto.createHmac("sha256", secret).update(token).digest("hex");
+  const hash = crypto
+    .createHmac("sha256", env.REFRESH_TOKEN_SECRET)
+    .update(token)
+    .digest("hex");
   this.refreshToken = hash;
 
   return token;
@@ -109,11 +113,44 @@ userSchema.methods.generateRefreshToken = function () {
 
 userSchema.methods.generateTemporaryToken = function () {
   const token = crypto.randomBytes(40).toString("hex");
-  const hash = crypto.createHmac("sha256").update(token).digest("hex");
+  const hash = crypto
+    .createHmac("sha256", env.TEMPORARY_TOKEN_SECRET)
+    .update(token)
+    .digest("hex");
 
   const tokenExpiry = Date.now() + 10 * 60 * 1000;
 
   return { token, hash, tokenExpiry };
+};
+
+userSchema.statics.signUp = async function (email, username, password) {
+  const existingUser = await this.findOne({ $or: [{ email }, { username }] });
+  if (existingUser) {
+    throw new ApiError("Email or username already exists");
+  }
+
+  const newUser = new this({
+    email,
+    username,
+    password,
+  });
+
+  const { token, hash, tokenExpiry } = newUser.generateTemporaryToken();
+  newUser.emailVerificationToken = hash;
+  newUser.emailVerificationExpiry = tokenExpiry;
+
+  const savedUser = await newUser.save();
+  if (!savedUser) {
+    throw new ApiError("User registration failed");
+  }
+
+  await sendEmail(
+    savedUser.email,
+    "Verify your email",
+    emailVerificationTemplate(savedUser.username, token),
+  );
+
+  return savedUser;
 };
 
 export const User = mongoose.model("User", userSchema);

@@ -56,16 +56,16 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
-    refreshToken: {
-      type: String,
-      select: false,
-    },
     forgotPasswordToken: {
       type: String,
       select: false,
     },
     forgotPasswordTokenExpiry: {
       type: Date,
+      select: false,
+    },
+    refreshToken: {
+      type: String,
       select: false,
     },
   },
@@ -82,6 +82,10 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 export const User = mongoose.model("User", userSchema);
 

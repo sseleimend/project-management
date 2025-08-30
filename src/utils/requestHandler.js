@@ -22,6 +22,12 @@ export function requestHandler(controllerFn) {
         throw new Error("Invalid response");
       }
 
+      if (response?.cookies) {
+        Object.entries(response.cookies).forEach(([name, value]) => {
+          res.cookie(name, value);
+        });
+      }
+
       res.status(statusCode).json(
         new ApiResponse({
           status: "success",

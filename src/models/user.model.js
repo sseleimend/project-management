@@ -1,5 +1,9 @@
+import crypto from "crypto";
+import { promisify } from "util";
+
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
   {
@@ -85,6 +89,30 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
+  });
+};
+
+userSchema.methods.generateRefreshToken = function () {
+  const secret = process.env.REFRESH_TOKEN_SECRET;
+  const token = crypto.randomBytes(40).toString("hex");
+  const hash = crypto.createHmac("sha256", secret).update(token).digest("hex");
+  this.refreshToken = hash;
+
+  return token;
+};
+
+userSchema.methods.generateTemporaryToken = function () {
+  const token = crypto.randomBytes(40).toString("hex");
+  const hash = crypto.createHmac("sha256").update(token).digest("hex");
+
+  const tokenExpiry = Date.now() + 10 * 60 * 1000;
+
+  return { token, hash, tokenExpiry };
 };
 
 export const User = mongoose.model("User", userSchema);

@@ -15,4 +15,22 @@ export const signUp = async (req) => {
   };
 };
 
-export default { signUp };
+export const login = async (req) => {
+  const { email, password } = matchedData(req);
+
+  const { user, accessToken, refreshToken } = await User.login(email, password);
+
+  return {
+    statusCode: StatusCodes.OK,
+    message: "User logged in successfully",
+    data: {
+      user,
+      accessToken,
+    },
+    cookies: {
+      refreshToken,
+    },
+  };
+};
+
+export default { signUp, login };

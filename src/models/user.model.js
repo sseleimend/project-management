@@ -8,6 +8,7 @@ import { env } from "../config/env.js";
 import { ApiError } from "../utils/ApiError.js";
 import { sendEmail } from "../utils/email.js";
 import { emailVerificationTemplate } from "../templates/email.js";
+import { StatusCodes } from "http-status-codes";
 
 const userSchema = new mongoose.Schema(
   {
@@ -126,7 +127,10 @@ userSchema.methods.generateTemporaryToken = function () {
 userSchema.statics.signUp = async function (email, username, password) {
   const existingUser = await this.findOne({ $or: [{ email }, { username }] });
   if (existingUser) {
-    throw new ApiError("Email or username already exists");
+    throw new ApiError(
+      "Email or username already exists",
+      StatusCodes.CONFLICT,
+    );
   }
 
   const newUser = new this({
@@ -141,7 +145,10 @@ userSchema.statics.signUp = async function (email, username, password) {
 
   const savedUser = await newUser.save();
   if (!savedUser) {
-    throw new ApiError("User registration failed");
+    throw new ApiError(
+      "User registration failed",
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    );
   }
 
   await sendEmail(
@@ -151,6 +158,29 @@ userSchema.statics.signUp = async function (email, username, password) {
   );
 
   return await User.findById(savedUser._id);
+};
+
+userSchema.statics.login = async function (email, password) {
+  const user = await this.findOne({ email }).select("+password");
+  const isMatch = await user?.comparePassword(password);
+
+  if (!user || !isMatch) {
+    throw new ApiError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+  }
+
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  const savedUser = await user.save();
+  if (!savedUser) {
+    throw new ApiError("User login failed", StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+
+  return {
+    user: await User.findById(savedUser._id),
+    accessToken,
+    refreshToken,
+  };
 };
 
 export const User = mongoose.model("User", userSchema);

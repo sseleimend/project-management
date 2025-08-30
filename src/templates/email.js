@@ -1,6 +1,6 @@
 import { env } from "../config/env.js";
 
-export const emailVerification = (username, token) => {
+export const emailVerificationTemplate = (username, token) => {
   const emailVerificationTemplate = {
     body: {
       name: username,
@@ -10,20 +10,17 @@ export const emailVerification = (username, token) => {
         button: {
           color: "#22BC66",
           text: "Verify Email",
-          link: `${env.BASE_URL}/verify-email?token=${token}`,
+          link: `${env.BASE_URL}/api/v1/auth/verify-email?token=${token}`,
         },
       },
-    },
-    outro: {
-      name: username,
-      instructions: "Need help? Contact our support team.",
+      outro: "Need help? Contact our support team.",
     },
   };
 
   return emailVerificationTemplate;
 };
 
-export const forgotPassword = (username, token) => {
+export const forgotPasswordTemplate = (username, token) => {
   const forgotPasswordTemplate = {
     body: {
       name: username,
@@ -33,13 +30,10 @@ export const forgotPassword = (username, token) => {
         button: {
           color: "#22BC66",
           text: "Reset Password",
-          link: `${env.BASE_URL}/reset-password?token=${token}`,
+          link: `${env.BASE_URL}/api/v1/auth/reset-password?token=${token}`,
         },
       },
-    },
-    outro: {
-      name: username,
-      instructions: "Need help? Contact our support team.",
+      outro: "Need help? Contact our support team.",
     },
   };
 
@@ -47,6 +41,6 @@ export const forgotPassword = (username, token) => {
 };
 
 export default {
-  emailVerification,
-  forgotPassword,
+  emailVerificationTemplate,
+  forgotPasswordTemplate,
 };
